@@ -15,9 +15,18 @@ int main(int argc, char **argv)
 
   Nob_Cmd cmd = {0};
 
-  // building our engine
-  nob_cmd_append(&cmd, "cc", "-Wall", "-Wextra");
+#ifdef __APPLE__
+  nob_cmd_append(&cmd, "cc", "-Wall", "-Wextra", "-I"INC_DIR);
   nob_cmd_append(&cmd, "-o", BUILD_DIR"main", SRC_DIR"main.c", SRC_DIR"glad.c");
-  nob_cmd_append(&cmd, "-I"INC_DIR, "-lGL", "-lGLU", "-lglut");
+  nob_cmd_append(&cmd, "-I/opt/homebrew/include", "-L/opt/homebrew/lib", "-lglfw");
+  nob_cmd_append(&cmd, "-framework", "Cocoa", "-framework", "OpenGL", "-framework", "IOKit",);
+  nob_cmd_append(&cmd, "-framework", "CoreVideo", "-framework", "QuartzCore");
+#endif
+#ifdef __linux__
+  // building our engine
+  nob_cmd_append(&cmd, "cc", "-Wall", "-Wextra", "-I"INC_DIR);
+  nob_cmd_append(&cmd, "-o", BUILD_DIR"main", SRC_DIR"main.c", SRC_DIR"glad.c");
+  nob_cmd_append(&cmd, "-lglfw3", "-lGL", "-lX11", "-lpthread", "-lXrandr", "-lXi", "-ldl");
+#endif
   if (!nob_cmd_run(&cmd)) return 1;
 }

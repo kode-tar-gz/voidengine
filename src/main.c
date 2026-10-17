@@ -2,7 +2,39 @@
 #include <stdbool.h>
 
 #include <glad/glad.h>
-#include <GL/freeglut.h>
+#include <GLFW/glfw3.h>
+
+GLFWwindow *init_gl(int w, int h, const char *title)
+{
+  // initialize GLFW
+  glfwInit();
+  printf("Initialized GLFW.\n");
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+  // create the window
+  GLFWwindow *window = glfwCreateWindow(w, h, title, NULL, NULL);
+  if (!window){
+    printf("[ERROR] Failed to create window.\n");
+    glfwTerminate();
+  }
+  printf("Created Window.\n");
+  glfwMakeContextCurrent(window);
+  printf("Configured Window.\n");
+
+  // initialize GLAD
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+    printf("[ERROR] Failed to initalize GLAD.\n");
+    glfwTerminate();
+  }
+
+  glViewport(0, 0, w, h);
+  return window;
+}
 
 void render_scene()
 {
@@ -10,7 +42,6 @@ void render_scene()
   static bool ascending = true;
 
   glClear(GL_COLOR_BUFFER_BIT);
-  glutPostRedisplay();
 
   glClearColor(dt*2, dt, dt*2, dt);
   if(dt <= 1.0f && ascending == true){
@@ -20,27 +51,21 @@ void render_scene()
     ascending = false;
   }
   if(dt <= 0.0f) ascending = true;
-
-  glutSwapBuffers();
 }
 
-int main(int argc, char **argv)
+
+int main()
 {
-  glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+  GLFWwindow *window = init_gl(800, 600, "Void Engine");
 
-  glutInitWindowSize(1280, 720);
-  glutInitWindowPosition(100, 100);
-  int window_id = glutCreateWindow("Hello, OpenGL!");
-  printf("[INFO] Window ID: %d\n", window_id);
+  while(!glfwWindowShouldClose(window)){
+    render_scene();
 
-  if(!gladLoadGL()){
-    printf("[ERROR] Failed to initalize GLAD.\n");
-    return 1;
+    glfwSwapBuffers(window);
+
+    glfwPollEvents();
   }
 
-  glutDisplayFunc(render_scene);
-  glutMainLoop();
-
+  glfwTerminate();
   return 0;
 }
