@@ -8,7 +8,6 @@ GLFWwindow *init_gl(int w, int h, const char *title)
 {
   // initialize GLFW
   glfwInit();
-  printf("Initialized GLFW.\n");
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -22,9 +21,7 @@ GLFWwindow *init_gl(int w, int h, const char *title)
     printf("[ERROR] Failed to create window.\n");
     glfwTerminate();
   }
-  printf("Created Window.\n");
   glfwMakeContextCurrent(window);
-  printf("Configured Window.\n");
 
   // initialize GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
