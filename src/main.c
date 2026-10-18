@@ -35,6 +35,7 @@ GLFWwindow *init_gl(int w, int h, const char *title)
 
 void render_scene()
 {
+  // pseudo delta-time; it's not actually delta-time but it'll work for this
   static GLclampf dt = 0.0f;
   static bool ascending = true;
 
@@ -50,16 +51,39 @@ void render_scene()
   if(dt <= 0.0f) ascending = true;
 }
 
+void handle_input(GLFWwindow *window)
+{
+  if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
+    glfwSetWindowShouldClose(window, true);
+  }
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    // TEMPORARY. Just silencing the pesky 'unused parameter' compiler warning
+    glfwGetWindowMonitor(window);
+}
 
 int main()
 {
-  GLFWwindow *window = init_gl(800, 600, "Void Engine");
+  int width  = 800;
+  int height = 600;
+  GLFWwindow *window = init_gl(width, height, "Void Engine");
+
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   while(!glfwWindowShouldClose(window)){
+    // input
+    handle_input(window);
+
+    // rendering
     render_scene();
 
+    // cleanup
     glfwSwapBuffers(window);
 
+    // check and poll events/callbacks
     glfwPollEvents();
   }
 
