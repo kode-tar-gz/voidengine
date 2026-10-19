@@ -37,6 +37,13 @@ compile_lib(Nob_Cmd *cmd_lib, const char *file, Nob_Cmd *cmd_main)
   strcat(final_file, file_no_ext);
   strcat(final_file, ".o");
 
+  // don't do anything if file hasn't been modified since last compilation
+  if(!nob_needs_rebuild(final_file, &file, 1)){
+    nob_log(NOB_INFO, "Skipping %s: Output '%s' is newer than input.", file, final_file);
+    nob_cmd_append(cmd_main, strdup(final_file));
+    return 0;
+  }
+
   // compile
   nob_cc(cmd_lib);
   nob_cmd_append(cmd_lib, "-c", "-I"INC_DIR, "-o", final_file, file);
