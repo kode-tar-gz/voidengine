@@ -73,16 +73,16 @@ main(int argc, char **argv)
   nob_cmd_append(&cmd_main, "-I"INC_DIR, "-o", BUILD_DIR"main", "main.c");
 
   // reading through our whole source directory and
-  // appending all source files inside to the list of files
-  // to be compiled, except for the ones we don't want to compile
+  // compiling all .c files, except this one and main.c.
+  // compile_lib() checks if the file needs to be rebuilt.
   nob_read_entire_dir(SRC_DIR, &src_files);
   for(int i = 0; i < src_files.count; i++){
     const char *file = src_files.items[i];
     const char *ext = strrchr(file, '.');
 
     //skip if we don't want the file to be compiled
-    if(!strncmp(file, "nob.c",  strlen(file))  ||
-       !strncmp(file, "main.c", strlen(file))  ||
+    if(!strncmp(file, "nob.c",  strlen(file)) ||
+       !strncmp(file, "main.c", strlen(file)) ||
        strcmp(ext, ".c")){
       continue;
     } else {
