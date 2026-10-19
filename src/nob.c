@@ -10,6 +10,7 @@
 void
 append_flags(Nob_Cmd *cmd)
 {
+  // platform-specific flags
 #ifdef __APPLE__
   nob_cmd_append(cmd, "-Wall", "-Wextra", "-I/opt/homebrew/include");
   nob_cmd_append(cmd, "-L/opt/homebrew/lib", "-lglfw", "-framework", "Cocoa");
@@ -24,8 +25,9 @@ append_flags(Nob_Cmd *cmd)
 int
 compile_lib(Nob_Cmd *cmd_lib, const char *file, Nob_Cmd *cmd_main)
 {
+  // reset cmd_lib
   cmd_lib->count = 0;
-  // get the filename without extension
+  // get the filename without '.c' extension
   char file_no_ext[50] = {0};
   strncpy(file_no_ext, file, (strlen(file) - 2));
 
@@ -77,8 +79,7 @@ main(int argc, char **argv)
        strcmp(ext, ".c")){
       continue;
     } else {
-      printf("[LOG] Compiling %s in loop.\n", src_files.items[i]);
-      // building all non-main files
+      // building all non-main files and appending to the main command
       if(compile_lib(&cmd_lib, file, &cmd_main) != 0) return 1;
     }
   }
