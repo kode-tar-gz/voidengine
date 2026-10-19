@@ -66,7 +66,7 @@ render_triangle()
   };
 
   // get our vertex buffer object
-  unsigned int VBO;
+  uint32_t VBO;
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -114,11 +114,8 @@ int main()
     "  FragColor = vec4(0.7f, 0.0f, 1.0f, 1.0f);"
     "{\0";
 
-  unsigned int vshader = glCreateShader(GL_VERTEX_SHADER);
-  compile_shader(vshader, vertex_shader_src);
-
-  unsigned int fshader = glCreateShader(GL_FRAGMENT_SHADER);
-  compile_shader(fshader, frag_shader_src);
+  Shader vshader = shader_load_from_str(SHADER_VERTEX, vertex_shader_src);
+  Shader fshader = shader_load_from_str(SHADER_FRAGMENT, frag_shader_src);
 
   while(!glfwWindowShouldClose(window)){
     // input

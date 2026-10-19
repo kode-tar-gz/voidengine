@@ -53,7 +53,7 @@ main(int argc, char **argv)
 {
   NOB_GO_REBUILD_URSELF(argc, argv);
 
-  // making our build directory if it doesn't already exist
+  // making our build directories if they don't already exist
   if(!nob_mkdir_if_not_exists(BUILD_DIR)) return 1;
   if(!nob_mkdir_if_not_exists(LINK_DIR)) return 1;
 
@@ -73,7 +73,7 @@ main(int argc, char **argv)
     const char *file = src_files.items[i];
     const char *ext = strrchr(file, '.');
 
-    //skip if we don't want the file to be compiled in this batch
+    //skip if we don't want the file to be compiled
     if(!strncmp(file, "nob.c",  strlen(file))  ||
        !strncmp(file, "main.c", strlen(file))  ||
        strcmp(ext, ".c")){
@@ -83,7 +83,6 @@ main(int argc, char **argv)
       if(compile_lib(&cmd_lib, file, &cmd_main) != 0) return 1;
     }
   }
-
 
   append_flags(&cmd_main);
   if (!nob_cmd_run(&cmd_main)) return 1;
