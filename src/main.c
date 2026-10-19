@@ -115,7 +115,9 @@ int main()
     "{\0";
 
   Shader vshader = shader_load_from_str(SHADER_VERTEX, vertex_shader_src);
+  shader_compile(vshader);
   Shader fshader = shader_load_from_str(SHADER_FRAGMENT, frag_shader_src);
+  shader_compile(fshader);
 
   while(!glfwWindowShouldClose(window)){
     // input
