@@ -23,7 +23,7 @@ append_flags(Nob_Cmd *cmd)
 }
 
 int
-compile_lib(Nob_Cmd *cmd_lib, const char *file, Nob_Cmd *cmd_main)
+compile_lib(Nob_Cmd *cmd_lib, Nob_Cmd *cmd_main, const char *file)
 {
   // reset cmd_lib
   cmd_lib->count = 0;
@@ -87,7 +87,7 @@ main(int argc, char **argv)
       continue;
     } else {
       // building all non-main files and appending to the main command
-      if(compile_lib(&cmd_lib, file, &cmd_main) != 0) return 1;
+      if(compile_lib(&cmd_lib, &cmd_main, file) != 0) return 1;
     }
   }
 
