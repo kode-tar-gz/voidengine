@@ -22,4 +22,13 @@ shader_compile(Shader shader);
 Shader
 shader_load_from_str(shader_kind_t kind, const char *src);
 
+uint32_t
+shader_program_get();
+
+void
+shader_program_attach(uint32_t prog, int count, ...);
+
+int32_t
+shader_program_link(uint32_t prog);
+
 #endif

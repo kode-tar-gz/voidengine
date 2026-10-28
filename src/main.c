@@ -56,25 +56,6 @@ render_pink_screen()
 }
 
 void
-render_triangle()
-{
-  // coordinates for our triangle's vertices
-  float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-  };
-
-  // get our vertex buffer object
-  uint32_t VBO;
-  glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  // copy data into buffer
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-}
-
-void
 handle_input(GLFWwindow *window)
 {
   if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
@@ -98,12 +79,33 @@ int main()
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+  // coordinates for our triangle's vertices
+  float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f
+  };
+
+  // get our vertex buffer object
+  uint32_t VBO, VAO;
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+  // copy data into buffer
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  // set the vertex attribute configuration
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+
   const char *vertex_shader_src =
     "#version 330 core\n"
-    "layout (location = 0) in vec3 v_pos;\n"
+    "layout (location = 0) in vec3 aPos;\n"
     "void main()\n"
     "{\n"
-    "  gl_Position = vec4(v_pos.x, v_pos.y, v_pos.z, 1.0);\n"
+    "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
     "}\0";
 
   const char *frag_shader_src =
@@ -112,12 +114,19 @@ int main()
     "void main()\n"
     "{\n"
     "  FragColor = vec4(0.7f, 0.0f, 1.0f, 1.0f);"
-    "{\0";
+    "}\0";
 
   Shader vshader = shader_load_from_str(SHADER_VERTEX, vertex_shader_src);
   shader_compile(vshader);
   Shader fshader = shader_load_from_str(SHADER_FRAGMENT, frag_shader_src);
   shader_compile(fshader);
+
+  uint32_t shader_program = shader_program_get();
+  shader_program_attach(shader_program, 2, vshader, fshader);
+  shader_program_link(shader_program);
+
+  glDeleteShader(vshader.id);
+  glDeleteShader(fshader.id);
 
   while(!glfwWindowShouldClose(window)){
     // input
@@ -125,6 +134,9 @@ int main()
 
     // rendering
     render_pink_screen();
+    glUseProgram(shader_program);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     // cleanup
     glfwSwapBuffers(window);
