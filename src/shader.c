@@ -74,7 +74,7 @@ shader_delete(int count, ...)
   for(int i = 0; i < count; i++) {
     shader = va_arg(args, Shader);
     glDeleteShader(shader.id);
-    free(shader.src);
+    free((void*)shader.src);
   }
   va_end(args);
 }
