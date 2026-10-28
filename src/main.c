@@ -28,12 +28,34 @@ const char *frag_shader_src =
   "  FragColor = vec4(0.7f, 0.0f, 1.0f, 1.0f);"
   "}\0";
 
+bool wireframe = false;
+
 void
 framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
     // TEMPORARY. Just silencing the pesky 'unused parameter' compiler warning
     glfwGetWindowMonitor(window);
+}
+
+void
+error_callback(int error, const char* description)
+{
+  fprintf(stderr, "[ERROR] %d : %s\n", error, description);
+}
+
+void
+key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+  if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+    glfwSetWindowShouldClose(window, true);
+  }
+
+  if(key == GLFW_KEY_W && action == GLFW_PRESS){
+    wireframe = true ? wireframe == false : false;
+    if(wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  }
 }
 
 GLFWwindow *
@@ -55,7 +77,12 @@ init_gl(int w, int h, const char *title)
     glfwTerminate();
   }
   glfwMakeContextCurrent(window);
+
+  // set callbacks
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  glfwSetErrorCallback(error_callback);
+  glfwSetKeyCallback(window, key_callback);
+  glfwSwapInterval(1);
 
   // initialize GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
@@ -81,7 +108,6 @@ init_buffers(uint32_t *VBO, uint32_t *VAO)
   // set the vertex attribute configuration
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
-
 }
 
 void
@@ -101,14 +127,6 @@ render_pink_screen()
     ascending = false;
   }
   if(dt <= 0.0f) ascending = true;
-}
-
-void
-handle_input(GLFWwindow *window)
-{
-  if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
-    glfwSetWindowShouldClose(window, true);
-  }
 }
 
 int
@@ -133,9 +151,6 @@ main()
   shader_delete(2, vshader, fshader);
 
   while(!glfwWindowShouldClose(window)){
-    // input
-    handle_input(window);
-
     // rendering
     render_pink_screen();
     glUseProgram(shader_program);
