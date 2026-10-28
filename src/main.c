@@ -71,7 +71,8 @@ framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glfwGetWindowMonitor(window);
 }
 
-int main()
+int
+main()
 {
   int width  = 800;
   int height = 600;
