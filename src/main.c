@@ -6,6 +6,36 @@
 
 #include "shader.h"
 
+const float vertices[] = {
+  -0.5f, -0.5f, 0.0f,
+   0.5f, -0.5f, 0.0f,
+   0.0f,  0.5f, 0.0f
+};
+
+const char *vertex_shader_src =
+  "#version 330 core\n"
+  "layout (location = 0) in vec3 aPos;\n"
+  "void main()\n"
+  "{\n"
+  "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
+  "}\0";
+
+const char *frag_shader_src =
+  "#version 330 core\n"
+  "out vec4 FragColor;\n"
+  "void main()\n"
+  "{\n"
+  "  FragColor = vec4(0.7f, 0.0f, 1.0f, 1.0f);"
+  "}\0";
+
+void
+framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+    glViewport(0, 0, width, height);
+    // TEMPORARY. Just silencing the pesky 'unused parameter' compiler warning
+    glfwGetWindowMonitor(window);
+}
+
 GLFWwindow *
 init_gl(int w, int h, const char *title)
 {
@@ -25,6 +55,7 @@ init_gl(int w, int h, const char *title)
     glfwTerminate();
   }
   glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   // initialize GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
@@ -34,6 +65,23 @@ init_gl(int w, int h, const char *title)
 
   glViewport(0, 0, w, h);
   return window;
+}
+
+void
+init_buffers(uint32_t *VBO, uint32_t *VAO)
+{
+  glGenVertexArrays(1, VAO);
+  glGenBuffers(1, VBO);
+  glBindVertexArray(*VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+
+  // copy data into buffer
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  // set the vertex attribute configuration
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+
 }
 
 void
@@ -63,14 +111,6 @@ handle_input(GLFWwindow *window)
   }
 }
 
-void
-framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-    // TEMPORARY. Just silencing the pesky 'unused parameter' compiler warning
-    glfwGetWindowMonitor(window);
-}
-
 int
 main()
 {
@@ -78,44 +118,9 @@ main()
   int height = 600;
   GLFWwindow *window = init_gl(width, height, "Void Engine");
 
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-  // coordinates for our triangle's vertices
-  float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-  };
-
-  // get our vertex buffer object
+  // get our vertex buffer object and vertex array object
   uint32_t VBO, VAO;
-  glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glBindVertexArray(VAO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-  // copy data into buffer
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  // set the vertex attribute configuration
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-
-  const char *vertex_shader_src =
-    "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
-    "}\0";
-
-  const char *frag_shader_src =
-    "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "  FragColor = vec4(0.7f, 0.0f, 1.0f, 1.0f);"
-    "}\0";
+  init_buffers(&VBO, &VAO);
 
   Shader vshader = shader_load_from_str(SHADER_VERTEX, vertex_shader_src);
   shader_compile(vshader);
@@ -125,9 +130,7 @@ main()
   uint32_t shader_program = shader_program_get();
   shader_program_attach(shader_program, 2, vshader, fshader);
   shader_program_link(shader_program);
-
-  glDeleteShader(vshader.id);
-  glDeleteShader(fshader.id);
+  shader_delete(2, vshader, fshader);
 
   while(!glfwWindowShouldClose(window)){
     // input

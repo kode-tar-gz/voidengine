@@ -37,6 +37,19 @@ shader_compile(Shader shader)
   return success;
 }
 
+void
+shader_delete(int count, ...)
+{
+  va_list args;
+  Shader shader;
+  va_start(args, count);
+  for(int i = 0; i < count; i++) {
+    shader = va_arg(args, Shader);
+    glDeleteShader(shader.id);
+  }
+  va_end(args);
+}
+
 uint32_t
 shader_program_get()
 {
