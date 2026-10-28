@@ -17,7 +17,10 @@ typedef struct {
 } Shader;
 
 Shader
-shader_load_from_str(shader_kind_t kind, const char *src);
+shader_load_from_str(shader_kind_t kind, char *src);
+
+Shader
+shader_load_from_file(shader_kind_t kind, const char *filepath);
 
 int
 shader_compile(Shader shader);

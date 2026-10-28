@@ -78,6 +78,9 @@ main(int argc, char **argv)
   nob_read_entire_dir(SRC_DIR, &src_files);
   for(int i = 0; i < src_files.count; i++){
     const char *file = src_files.items[i];
+    if(nob_get_file_type(file) == NOB_FILE_DIRECTORY){
+      continue;
+    }
     const char *ext = strrchr(file, '.');
 
     //skip if we don't want the file to be compiled

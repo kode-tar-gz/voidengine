@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -8,12 +10,38 @@
 #include "shader.h"
 
 Shader
-shader_load_from_str(shader_kind_t kind, const char *src)
+shader_load_from_str(shader_kind_t kind, char *src)
 {
   uint32_t id = glCreateShader(kind);
   Shader shader = {.id = id,
 		   .kind = kind,
 		   .src = src};
+  return shader;
+}
+
+Shader
+shader_load_from_file(shader_kind_t kind, const char *filepath)
+{
+  FILE *src_fd;
+  if ((src_fd = fopen(filepath, "r")) == NULL){
+    perror(filepath);
+    exit(1);
+  }
+
+  fseek(src_fd, 0, SEEK_END);
+  size_t fsize = ftell(src_fd);
+  assert(fsize > 0);
+
+  char *src = (char*)malloc(fsize);
+  fseek(src_fd, 0, SEEK_SET);
+  if(fread(src, 1, fsize, src_fd) < fsize){
+    perror(filepath);
+    exit(1);
+  }
+  printf("Loaded %s (%zu bytes) successfully :3\n", filepath, fsize);
+
+  fclose(src_fd);
+  Shader shader = shader_load_from_str(kind, src);
   return shader;
 }
 
@@ -46,6 +74,7 @@ shader_delete(int count, ...)
   for(int i = 0; i < count; i++) {
     shader = va_arg(args, Shader);
     glDeleteShader(shader.id);
+    free(shader.src);
   }
   va_end(args);
 }

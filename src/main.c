@@ -7,9 +7,16 @@
 #include "shader.h"
 
 const float vertices[] = {
-  -0.5f, -0.5f, 0.0f,
+  // first triangle
+   0.5f,  0.5f, 0.0f,
    0.5f, -0.5f, 0.0f,
-   0.0f,  0.5f, 0.0f
+  -0.5f, -0.5f, 0.0f,
+  -0.5f,  0.5f, 0.0f,
+};
+
+const uint32_t indices[] = {
+  0, 1, 3, // first triangle
+  1, 2, 3 // second triangle
 };
 
 const char *vertex_shader_src =
@@ -47,7 +54,7 @@ error_callback(int error, const char* description)
 void
 key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
-  if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+  if(key == GLFW_KEY_Q && action == GLFW_PRESS){
     glfwSetWindowShouldClose(window, true);
   }
 
@@ -95,15 +102,21 @@ init_gl(int w, int h, const char *title)
 }
 
 void
-init_buffers(uint32_t *VBO, uint32_t *VAO)
+init_buffers(uint32_t *VBO, uint32_t *VAO, uint32_t *EBO)
 {
+  // generate buffers
   glGenVertexArrays(1, VAO);
+  glGenBuffers(1, EBO);
   glGenBuffers(1, VBO);
+
+  // bind buffers
   glBindVertexArray(*VAO);
   glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
 
-  // copy data into buffer
+  // copy data into buffers
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // set the vertex attribute configuration
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -137,12 +150,12 @@ main()
   GLFWwindow *window = init_gl(width, height, "Void Engine");
 
   // get our vertex buffer object and vertex array object
-  uint32_t VBO, VAO;
-  init_buffers(&VBO, &VAO);
+  uint32_t VBO, VAO, EBO;
+  init_buffers(&VBO, &VAO, &EBO);
 
-  Shader vshader = shader_load_from_str(SHADER_VERTEX, vertex_shader_src);
+  Shader vshader = shader_load_from_file(SHADER_VERTEX, "./shaders/vertex.glsl");
   shader_compile(vshader);
-  Shader fshader = shader_load_from_str(SHADER_FRAGMENT, frag_shader_src);
+  Shader fshader = shader_load_from_file(SHADER_FRAGMENT, "./shaders/fragment.glsl");
   shader_compile(fshader);
 
   uint32_t shader_program = shader_program_get();
@@ -153,9 +166,11 @@ main()
   while(!glfwWindowShouldClose(window)){
     // rendering
     render_pink_screen();
+
     glUseProgram(shader_program);
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 
     // cleanup
     glfwSwapBuffers(window);
