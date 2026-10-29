@@ -4,37 +4,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-typedef enum {
-  SHADER_VERTEX   = GL_VERTEX_SHADER,
-  SHADER_FRAGMENT = GL_FRAGMENT_SHADER,
-  SHADER_GEOMETRY = GL_GEOMETRY_SHADER
-} shader_kind_t;
-
-typedef struct {
-  uint32_t id;
-  shader_kind_t kind;
-  const char *src;
-} Shader;
+typedef uint32_t Shader;
 
 Shader
-shader_load_from_str(shader_kind_t kind, char *src);
-
-Shader
-shader_load_from_file(shader_kind_t kind, const char *filepath);
-
-int
-shader_compile(Shader shader);
+shader_load_from_file(const char *vertex, const char *fragment);
 
 void
-shader_delete(int count, ...);
-
-uint32_t
-shader_program_get();
-
-void
-shader_program_attach(uint32_t prog, int count, ...);
-
-int32_t
-shader_program_link(uint32_t prog);
+shader_use(Shader shader);
 
 #endif

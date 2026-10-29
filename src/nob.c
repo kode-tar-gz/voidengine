@@ -96,4 +96,9 @@ main(int argc, char **argv)
 
   append_flags(&cmd_main);
   if (!nob_cmd_run(&cmd_main)) return 1;
+
+  // separate nob logs from engine logs!
+  nob_log(NOB_INFO, "Compilation successfull!");
+  printf("\n--------------------------------------------------------\n\n");
+  return 0;
 }

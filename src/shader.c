@@ -8,99 +8,56 @@
 #include <GLFW/glfw3.h>
 
 #include "shader.h"
-
-Shader
-shader_load_from_str(shader_kind_t kind, char *src)
-{
-  uint32_t id = glCreateShader(kind);
-  Shader shader = {.id = id,
-		   .kind = kind,
-		   .src = src};
-  return shader;
-}
-
-Shader
-shader_load_from_file(shader_kind_t kind, const char *filepath)
-{
-  FILE *src_fd;
-  if ((src_fd = fopen(filepath, "r")) == NULL){
-    perror(filepath);
-    exit(1);
-  }
-
-  fseek(src_fd, 0, SEEK_END);
-  size_t fsize = ftell(src_fd);
-  assert(fsize > 0);
-
-  char *src = (char*)malloc(fsize + 1);
-  fseek(src_fd, 0, SEEK_SET);
-  if(fread(src, 1, fsize, src_fd) < fsize){
-    perror(filepath);
-    exit(1);
-  }
-  src[fsize] = '\0';
-  printf("Loaded %s (%zu bytes) successfully :3\n", filepath, fsize);
-
-  fclose(src_fd);
-  Shader shader = shader_load_from_str(kind, src);
-  return shader;
-}
+#include "core.h"
 
 int32_t
-shader_compile(Shader shader)
+shader_compile(Shader shader, const char *src)
 {
   int32_t success;
   char info_log[512] = {0};
 
   // compile shader
-  glShaderSource(shader.id, 1, &shader.src, NULL);
-  glCompileShader(shader.id);
+  glShaderSource(shader, 1, &src, NULL);
+  glCompileShader(shader);
 
   // check and handle errors
-  glGetShaderiv(shader.id, GL_COMPILE_STATUS, &success);
+  glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if(!success){
-    glGetShaderInfoLog(shader.id, 512, NULL, info_log);
-    printf("[ERROR] SHADER %d COMPILATION FAILED: %s\n", shader.id, info_log);
+    glGetShaderInfoLog(shader, 512, NULL, info_log);
+    printf("[ERROR] SHADER %d COMPILATION FAILED: %s\n", shader, info_log);
   }
 
   return success;
 }
 
 void
-shader_delete(int count, ...)
+shader_delete(Shader shader, char *src)
 {
-  va_list args;
-  Shader shader;
-  va_start(args, count);
-  for(int i = 0; i < count; i++) {
-    shader = va_arg(args, Shader);
-    glDeleteShader(shader.id);
-    free((void*)shader.src);
-  }
-  va_end(args);
+  glDeleteShader(shader);
+  free((void*)src);
 }
 
-uint32_t
+Shader
 shader_program_get()
 {
-  return glCreateProgram();
+  return (Shader)glCreateProgram();
 }
 
 void
-shader_program_attach(uint32_t prog, int count, ...)
+shader_program_attach(Shader prog, int count, ...)
 {
   va_list args;
-  Shader shader;
+  uint32_t shader;
   va_start(args, count);
   for(int i = 0; i < count; i++) {
-    shader = va_arg(args, Shader);
-    glAttachShader(prog, shader.id);
+    shader = va_arg(args, uint32_t);
+    glAttachShader(prog, shader);
   }
   va_end(args);
 }
 
 int32_t
-shader_program_link(uint32_t prog)
+shader_program_link(Shader prog)
 {
   int32_t success;
   char info_log[512] = {0};
@@ -114,4 +71,37 @@ shader_program_link(uint32_t prog)
   }
 
   return success;
+}
+
+// here are the functions that are actually available to external contexts
+
+Shader
+shader_load_from_file(const char *vertex, const char *fragment)
+{
+  // get the program
+  Shader shader = shader_program_get();
+  // get the vertex and fragment shader ids
+  Shader vshader = glCreateShader(GL_VERTEX_SHADER);
+  Shader fshader = glCreateShader(GL_FRAGMENT_SHADER);
+  // get the source for those shaders and compile them
+  char *vsrc = load_source_file(vertex);
+  char *fsrc = load_source_file(fragment);
+  shader_compile(vshader, vsrc);
+  shader_compile(fshader, fsrc);
+
+  // attach the shaders to the program
+  shader_program_attach(shader, 2, vshader, fshader);
+  shader_program_link(shader);
+
+  // cleanup
+  shader_delete(vshader, vsrc);
+  shader_delete(fshader, fsrc);
+
+  return shader;
+}
+
+void
+shader_use(Shader shader)
+{
+  glUseProgram(shader);
 }
