@@ -32,12 +32,13 @@ shader_load_from_file(shader_kind_t kind, const char *filepath)
   size_t fsize = ftell(src_fd);
   assert(fsize > 0);
 
-  char *src = (char*)malloc(fsize);
+  char *src = (char*)malloc(fsize + 1);
   fseek(src_fd, 0, SEEK_SET);
   if(fread(src, 1, fsize, src_fd) < fsize){
     perror(filepath);
     exit(1);
   }
+  src[fsize] = '\0';
   printf("Loaded %s (%zu bytes) successfully :3\n", filepath, fsize);
 
   fclose(src_fd);
