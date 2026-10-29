@@ -105,3 +105,21 @@ shader_use(Shader shader)
 {
   glUseProgram(shader);
 }
+
+void
+shader_set_bool(Shader shader, const char *name, bool val)
+{
+  glUniform1i(glGetUniformLocation(shader, name), (int)val);
+}
+
+void
+shader_set_int(Shader shader, const char *name, int val)
+{
+  glUniform1i(glGetUniformLocation(shader, name), val);
+}
+
+void
+shader_set_float(Shader shader, const char *name, float val)
+{
+  glUniform1f(glGetUniformLocation(shader, name), val);
+}

@@ -1,6 +1,11 @@
 #version 330 core
-out vec4 FragColor;
+
+uniform float dt; // our delta time
+
+in vec3 new_col;
+out vec4 frag_color;
+
 void main()
 {
-  FragColor = vec4(0.7f, 0.0f, 1.0f, 1.0f);
+  frag_color = vec4(new_col, 1.0f);
 }

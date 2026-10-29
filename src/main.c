@@ -19,12 +19,14 @@ main()
   uint32_t VBO, VAO, EBO;
   init_buffers(&VBO, &VAO, &EBO);
 
+  // get our shader
   Shader shader = shader_load_from_file("shaders/vertex.glsl", "shaders/fragment.glsl");
+  shader_use(shader);
 
   while(!glfwWindowShouldClose(window)){
     // rendering
-    render_pink_screen();
     shader_use(shader);
+    render_pink_screen();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

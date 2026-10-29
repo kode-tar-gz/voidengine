@@ -9,16 +9,14 @@
 #include "core.h"
 
 const float vertices[] = {
-  // first triangle
-   0.5f,  0.5f, 0.0f,
-   0.5f, -0.5f, 0.0f,
-  -0.5f, -0.5f, 0.0f,
-  -0.5f,  0.5f, 0.0f,
+  // vertex position     // vertex color
+   0.0f,  0.5f, 0.0f,    1.0f,  0.0f, 0.0f,
+   0.5f, -0.5f, 0.0f,	 0.0f,  1.0f, 0.0f,
+  -0.5f, -0.5f, 0.0f,	 0.0f,  0.0f, 1.0f,
 };
 
 const uint32_t indices[] = {
-  0, 1, 3, // first triangle
-  1, 2, 3 // second triangle
+  0, 1, 2,
 };
 
 static bool wireframe = false;
@@ -84,6 +82,12 @@ init_gl(int w, int h, const char *title)
   }
 
   glViewport(0, 0, w, h);
+
+  // before returning, get some logs that might be useful
+  int n_attr;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &n_attr);
+  printf("[INFO] Maximum number of vertex attributes: %d\n", n_attr);
+
   return window;
 }
 
@@ -105,8 +109,14 @@ init_buffers(uint32_t *VBO, uint32_t *VAO, uint32_t *EBO)
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // set the vertex attribute configuration
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
+  uint32_t pos_index = 0;
+  uint32_t col_index = 1;
+  int32_t  size      = 3;
+  size_t   stride    = 6 * sizeof(float);
+  glVertexAttribPointer(pos_index, size, GL_FLOAT, GL_FALSE, stride, (void*)0);
+  glEnableVertexAttribArray(pos_index);
+  glVertexAttribPointer(col_index, size, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(col_index);
 }
 
 void
