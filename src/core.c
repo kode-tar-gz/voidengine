@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <assert.h>
 #include <stdbool.h>
 
@@ -32,7 +33,7 @@ framebuffer_size_callback(GLFWwindow* window, int width, int height)
 void
 error_callback(int error, const char* description)
 {
-  fprintf(stderr, "[ERROR] %d : %s\n", error, description);
+  void_log(ERROR, "%d : %s\n", error, description);
 }
 
 void
@@ -64,7 +65,7 @@ init_gl(int w, int h, const char *title)
   // create the window
   GLFWwindow *window = glfwCreateWindow(w, h, title, NULL, NULL);
   if (!window){
-    printf("[ERROR] Failed to create window.\n");
+    void_log(ERROR, "Failed to create window.\n");
     glfwTerminate();
   }
   glfwMakeContextCurrent(window);
@@ -77,7 +78,7 @@ init_gl(int w, int h, const char *title)
 
   // initialize GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-    printf("[ERROR] Failed to initalize GLAD.\n");
+    void_log(ERROR, "Failed to initalize GLAD.\n");
     glfwTerminate();
   }
 
@@ -86,7 +87,7 @@ init_gl(int w, int h, const char *title)
   // before returning, get some logs that might be useful
   int n_attr;
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &n_attr);
-  printf("[INFO] Maximum number of vertex attributes: %d\n", n_attr);
+  void_log(INFO, "Maximum number of vertex attributes: %d\n", n_attr);
 
   return window;
 }
@@ -117,6 +118,25 @@ init_buffers(uint32_t *VBO, uint32_t *VAO, uint32_t *EBO)
   glEnableVertexAttribArray(pos_index);
   glVertexAttribPointer(col_index, size, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(col_index);
+}
+
+void
+void_log(Log_level lvl, const char *str, ...){
+  char format[512];
+  char *level;
+  switch(lvl){
+    case INFO:    level = "[INFO] %s"; break;
+    case LOG:     level = "[LOG] %s"; break;
+    case WARNING: level = "[WARNING] %s"; break;
+    case ERROR:   level = "[ERROR] %s"; break;
+  }
+  snprintf(format, sizeof(format), level, str);
+
+  va_list ap;
+  va_start(ap, str);
+  vfprintf(lvl != ERROR ? stdout : stderr,
+	   format, ap);
+  va_end(ap);
 }
 
 void
@@ -159,7 +179,7 @@ load_source_file(const char *filepath)
   }
 
   src[fsize] = '\0';
-  printf("[INFO] Loaded %s (%zu bytes) successfully :3\n", filepath, fsize);
+  void_log(INFO, "Loaded %s (%zu bytes) successfully :3\n", filepath, fsize);
 
   fclose(src_fd);
   return src;

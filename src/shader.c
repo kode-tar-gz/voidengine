@@ -24,7 +24,7 @@ shader_compile(Shader shader, const char *src)
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if(!success){
     glGetShaderInfoLog(shader, 512, NULL, info_log);
-    printf("[ERROR] SHADER %d COMPILATION FAILED: %s\n", shader, info_log);
+    void_log(ERROR, "Shader %d compilation failed: %s\n", shader, info_log);
   }
 
   return success;
@@ -67,7 +67,7 @@ shader_program_link(Shader prog)
   glGetProgramiv(prog, GL_LINK_STATUS, &success);
   if(!success){
     glGetProgramInfoLog(prog, 512, NULL, info_log);
-    printf("[ERROR] PROGRAM %d LINKING FAILED: %s\n", prog, info_log);
+    void_log(ERROR, "Program %d linking failed: %s\n", prog, info_log);
   }
 
   return success;
