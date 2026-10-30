@@ -24,8 +24,11 @@ main()
   shader_use(shader);
 
   while(!glfwWindowShouldClose(window)){
-    // rendering
     shader_use(shader);
+    float current_frame = glfwGetTime();
+    shader_set_float(shader, "dt", current_frame);
+
+    // rendering
     render_pink_screen();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
