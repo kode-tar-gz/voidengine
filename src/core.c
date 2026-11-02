@@ -82,7 +82,13 @@ init_gl(int w, int h, const char *title)
     glfwTerminate();
   }
 
+  #ifdef __APPLE__
+  int pw, ph;
+  glfwGetFramebufferSize(window, &pw, &ph);
+  glViewport(0, 0, pw, ph);
+  #else
   glViewport(0, 0, w, h);
+  #endif
 
   // before returning, get some logs that might be useful
   int n_attr;
