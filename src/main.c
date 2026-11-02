@@ -22,6 +22,7 @@ main()
   // get our shader
   Shader shader = shader_load_from_file("shaders/vertex.glsl", "shaders/fragment.glsl");
   shader_use(shader);
+  gl_check_error();
 
   while(!glfwWindowShouldClose(window)){
     shader_use(shader);
@@ -39,6 +40,7 @@ main()
 
     // check and poll events/callbacks
     glfwPollEvents();
+    gl_check_error();
   }
 
   glfwTerminate();

@@ -82,6 +82,7 @@ init_gl(int w, int h, const char *title)
     glfwTerminate();
   }
 
+  // Apple's Retina display scaling fucks up the viewport
   #ifdef __APPLE__
   int pw, ph;
   glfwGetFramebufferSize(window, &pw, &ph);
@@ -90,10 +91,21 @@ init_gl(int w, int h, const char *title)
   glViewport(0, 0, w, h);
   #endif
 
+  #ifdef VOID_LOG
   // before returning, get some logs that might be useful
   int n_attr;
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &n_attr);
-  void_log(INFO, "Maximum number of vertex attributes: %d\n", n_attr);
+  char *vendor = glGetString(GL_VENDOR);
+  char *renderer = glGetString(GL_RENDERER);
+  char *version = glGetString(GL_VERSION);
+  char *shading_language_version = glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+  void_log(LOG, "GPU Vendor: %s\n", vendor);
+  void_log(LOG, "Renderer: %s\n", renderer);
+  void_log(LOG, "OpenGL Version: %s\n", version);
+  void_log(LOG, "Shading Language Version: %s\n", shading_language_version);
+  void_log(LOG, "Maximum number of vertex attributes: %d\n", n_attr);
+  #endif
 
   return window;
 }

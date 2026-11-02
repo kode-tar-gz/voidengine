@@ -23,7 +23,7 @@ void
 void_log(Log_level lvl, const char *str, ...);
 
 static inline GLenum
-__gl_check_error(const char *file, const char *line)
+__gl_check_error(const char *file, const int line)
 {
   GLenum err;
   while((err = glGetError()) != GL_NO_ERROR){
@@ -35,7 +35,7 @@ __gl_check_error(const char *file, const char *line)
     case GL_OUT_OF_MEMORY:                 error_str = "OUT_OF_MEMORY"; break;
     case GL_INVALID_FRAMEBUFFER_OPERATION: error_str = "INVALID_FRAMEBUFFER_OPERATION"; break;
     }
-    void_log(ERROR, "%s:%s: %s\n", file, line, error_str);
+    void_log(ERROR, "%s:%d: %s\n", file, line, error_str);
   }
   return err;
 }

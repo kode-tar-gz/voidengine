@@ -7,6 +7,8 @@
 #define SRC_DIR   "./"
 #define INC_DIR   "../include/"
 
+bool void_log = true;
+
 void
 append_flags(Nob_Cmd *cmd)
 {
@@ -47,6 +49,7 @@ compile_lib(Nob_Cmd *cmd_lib, Nob_Cmd *cmd_main, const char *file)
   // compile
   nob_cc(cmd_lib);
   nob_cmd_append(cmd_lib, "-c", "-I"INC_DIR, "-o", final_file, file);
+  if(void_log) nob_cmd_append(cmd_lib, "-DVOID_LOG");
   append_flags(cmd_lib);
   if (!nob_cmd_run(cmd_lib)) return 1;
 
@@ -71,6 +74,7 @@ main(int argc, char **argv)
   // We start the command for compiling main and append libs as we go
   nob_cc(&cmd_main);
   nob_cmd_append(&cmd_main, "-I"INC_DIR, "-o", BUILD_DIR"main", "main.c");
+  if(void_log) nob_cmd_append(&cmd_main, "-DVOID_LOG");
 
   // reading through our whole source directory and
   // compiling all .c files, except this one and main.c.
