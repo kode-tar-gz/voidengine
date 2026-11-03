@@ -19,7 +19,7 @@ append_flags(Nob_Cmd *cmd)
   nob_cmd_append(cmd, "-framework", "OpenGL", "-framework", "IOKit",);
   nob_cmd_append(cmd, "-framework", "CoreVideo", "-framework", "QuartzCore");
 #else
-  nob_cmd_append(cmd, "-Wall", "-Wextra", "-lglfw", "-lGL",);
+  nob_cmd_append(cmd, "-Wall", "-Wextra", "-lm","-lglfw", "-lGL",);
   nob_cmd_append(cmd, "-lX11", "-lpthread", "-lXrandr", "-lXi", "-ldl");
 #endif
 }

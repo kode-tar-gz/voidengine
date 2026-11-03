@@ -10,10 +10,10 @@
 #include "core.h"
 
 const float vertices[] = {
-  // vertex position     // vertex color
-   0.0f,  0.5f, 0.0f,    1.0f,  0.0f, 0.0f,
-   0.5f, -0.5f, 0.0f,	 0.0f,  1.0f, 0.0f,
-  -0.5f, -0.5f, 0.0f,	 0.0f,  0.0f, 1.0f,
+  // vertex position     // vertex color      // texture coords
+   0.0f,  0.5f, 0.0f,    1.0f,  0.0f, 0.0f,   0.5f, -1.0f,
+   0.5f, -0.5f, 0.0f,	 0.0f,  1.0f, 0.0f,   1.0f, -0.0f,
+  -0.5f, -0.5f, 0.0f,	 0.0f,  0.0f, 1.0f,   0.0f, -0.0f,
 };
 
 const uint32_t indices[] = {
@@ -130,12 +130,15 @@ init_buffers(uint32_t *VBO, uint32_t *VAO, uint32_t *EBO)
   // set the vertex attribute configuration
   uint32_t pos_index = 0;
   uint32_t col_index = 1;
+  uint32_t tex_index = 2;
   int32_t  size      = 3;
-  size_t   stride    = 6 * sizeof(float);
+  size_t   stride    = 8 * sizeof(float);
   glVertexAttribPointer(pos_index, size, GL_FLOAT, GL_FALSE, stride, (void*)0);
   glEnableVertexAttribArray(pos_index);
   glVertexAttribPointer(col_index, size, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(col_index);
+  glVertexAttribPointer(tex_index, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+  glEnableVertexAttribArray(tex_index);
 }
 
 void
