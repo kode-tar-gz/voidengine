@@ -2,10 +2,12 @@
 
 layout (location = 0) in vec3 v_pos;
 layout (location = 1) in vec3 v_col;
+layout (location = 2) in vec2 v_tex;
 
 uniform float dt; // our delta time
 
 out vec3 new_col;
+out vec2 tex_coord;
 
 void main()
 {
@@ -30,4 +32,5 @@ void main()
 
   gl_Position = vec4(v_pos, 1.0);
   new_col = rot_col;
+  tex_coord = v_tex;
 }
