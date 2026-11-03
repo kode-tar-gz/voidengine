@@ -95,10 +95,10 @@ init_gl(int w, int h, const char *title)
   // before returning, get some logs that might be useful
   int n_attr;
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &n_attr);
-  char *vendor = glGetString(GL_VENDOR);
-  char *renderer = glGetString(GL_RENDERER);
-  char *version = glGetString(GL_VERSION);
-  char *shading_language_version = glGetString(GL_SHADING_LANGUAGE_VERSION);
+  const unsigned char *vendor = glGetString(GL_VENDOR);
+  const unsigned char *renderer = glGetString(GL_RENDERER);
+  const unsigned char *version = glGetString(GL_VERSION);
+  const unsigned char *shading_language_version = glGetString(GL_SHADING_LANGUAGE_VERSION);
 
   void_log(LOG, "GPU Vendor: %s\n", vendor);
   void_log(LOG, "Renderer: %s\n", renderer);
@@ -176,6 +176,7 @@ render_pink_screen()
   if(dt <= 0.0f) ascending = true;
 }
 
+// the returned pointer is allocated on the heap, must be freed by caller!!!
 char *
 load_source_file(const char *filepath)
 {
