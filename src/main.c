@@ -28,7 +28,8 @@ main()
   gl_check_error();
 
   // get our texture
-  Texture tex = texture_load_from_file(ASSETS_DIR"tex.jpg");
+  stbi_set_flip_vertically_on_load(true);
+  Texture tex = texture_load_from_file("../howitbe.png");
   texture_use(tex);
 
   while(!glfwWindowShouldClose(window)){
