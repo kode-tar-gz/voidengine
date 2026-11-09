@@ -1,6 +1,5 @@
 build/
-
-*.png
+assets/
 
 src/nob
 src/nob.old
