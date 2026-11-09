@@ -10,6 +10,8 @@
 #include "core.h"
 #include "texture.h"
 
+#define ASSETS_DIR "../assets/"
+
 int
 main()
 {
@@ -27,7 +29,7 @@ main()
   gl_check_error();
 
   // get our texture
-  Texture tex = texture_load_from_file("../howitbe.png");
+  Texture tex = texture_load_from_file(ASSETS_DIR"tex.jpg");
   texture_use(tex);
 
   while(!glfwWindowShouldClose(window)){
@@ -36,7 +38,10 @@ main()
     shader_set_float(shader, "dt", current_frame);
 
     // rendering
-    render_pink_screen();
+    //render_pink_screen();
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0, 0, 0, 0);
+
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
