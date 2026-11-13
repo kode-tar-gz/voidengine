@@ -29,7 +29,7 @@ main()
 
   // get our texture
   stbi_set_flip_vertically_on_load(true);
-  Texture tex = texture_load_from_file("../howitbe.png");
+  Texture tex = texture_load_from_file(ASSETS_DIR"tex.jpg");
   texture_use(tex);
 
   while(!glfwWindowShouldClose(window)){
